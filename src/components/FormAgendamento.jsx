@@ -59,9 +59,10 @@ function FormAgendamento() {
           style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #333', background: '#242424', color: '#fff' }}
         >
           <option value="">Selecione um profissional</option>
-          <option value="1">Seu Carlos (Cabelo & Barba)</option>
-          <option value="2">Marcos Mandrake (Degradê & Risquinho)</option>
-          <option value="3">Thiago Navalha (Barboterapia)</option>
+          <option value="1">Alberth Maquininha (Cabelo & Barba)</option>
+          <option value="2">Felipe Mandrake (Degradê & Risquinho)</option>
+          <option value="3">Kayo Navalha (Barboterapia)</option>
+          <option value="4">Ramon Gilete (Corte & Sombrancelha)</option>
         </select>
       </div>
 
