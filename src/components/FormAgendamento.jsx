@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify'; // Importando a notificação bonita
 
 function FormAgendamento() {
   // Estados para guardar o que o usuário preenche
   const [profissional, setProfissional] = useState('');
   const [servico, setServico] = useState('');
-  const [data, setData] = useState('');
+  const [data, setData] = useState(''); // Vai guardar direto o "DD/MM"
   const [hora, setHora] = useState('');
   const [nomeCliente, setNomeCliente] = useState('');
 
@@ -16,14 +17,39 @@ function FormAgendamento() {
       cliente: nomeCliente,
       profissional_id: profissional,
       servico: servico,
-      data: data,
+      data: data, // Já está apenas com dia e mês!
       hora: hora
     };
 
-    console.log("Dados prontos para enviar para o PHP:", dadosAgendamento);
-    alert(`Agendamento enviado com sucesso para o cliente ${nomeCliente}!`);
+    console.log("Dados prontos para enviar para o PHP (Apenas Dia/Mês):", dadosAgendamento);
     
-    // Aqui depois faremos o fetch/axios para a API PHP
+    // Notificação moderna substituindo o alert simples
+    toast.success(`💈 Agendamento para ${data} às ${hora} enviado com sucesso!`, {
+      style: {
+        background: '#1a1a1a',
+        color: '#d4af37',
+        border: '1px solid #d4af37'
+      },
+      progressStyle: {
+        background: '#d4af37'
+      }
+    });
+    
+    // Limpar campos após o envio
+    setNomeCliente('');
+    setProfissional('');
+    setServico('');
+    setData('');
+    setHora('');
+  };
+
+  // Função para criar uma máscara simples de "00/00" enquanto digita
+  const handleDataChange = (e) => {
+    let valor = e.target.value.replace(/\D/g, ""); // Remove tudo que não for número
+    if (valor.length > 2) {
+      valor = `${valor.substring(0, 2)}/${valor.substring(2, 4)}`; // Coloca a barra automática
+    }
+    setData(valor.substring(0, 5)); // Limita em no máximo 5 caracteres (DD/MM)
   };
 
   return (
@@ -78,19 +104,21 @@ function FormAgendamento() {
           <option value="Corte Simples">Corte Simples - R$ 35,00</option>
           <option value="Barba Completa">Barba Completa - R$ 25,00</option>
           <option value="Combo Cabelo e Barba">Combo Cabelo + Barba - R$ 50,00</option>
-          <option value="Pé">Pé - R$ 5, 00 </option>
+          <option value="Pé">Pé - R$ 5,00 </option>
           <option value="Pigmentação">Pigmentação - R$ 8,00</option>
         </select>
       </div>
 
       <div style={{ display: 'flex', gap: '10px' }}>
         <div style={{ flex: 1 }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Data:</label>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Data (Dia/Mês):</label>
           <input 
-            type="date" 
+            type="text" 
             required
             value={data}
-            onChange={(e) => setData(e.target.value)}
+            onChange={handleDataChange}
+            placeholder="Ex: 12/05"
+            maxLength="5"
             style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #333', background: '#242424', color: '#fff' }}
           />
         </div>
