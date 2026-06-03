@@ -104,7 +104,7 @@ function FormAgendamento() {
           <option value="Corte Simples">Corte Simples - R$ 35,00</option>
           <option value="Barba Completa">Barba Completa - R$ 25,00</option>
           <option value="Combo Cabelo e Barba">Combo Cabelo + Barba - R$ 50,00</option>
-          <option value="Pé">Pé - R$ 5,00 </option>
+          <option value="Pé">Pezinho- R$ 5,00 </option>
           <option value="Pigmentação">Pigmentação - R$ 8,00</option>
         </select>
       </div>
