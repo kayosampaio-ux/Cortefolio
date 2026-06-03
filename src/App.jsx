@@ -1,4 +1,12 @@
+import { Routes, Route, Link } from 'react-router-dom';
 import './App.css';
+
+import Home from './Pages/Home';
+import Agendar from './Pages/Agendar';
+import Agenda from './Pages/Agenda';
+import Clientes from './Pages/Clientes';
+import Profissionais from './Pages/Profissionais';
+import Login from './Pages/Login';
 
 function App() {
   return (
@@ -13,81 +21,24 @@ function App() {
         </div>
 
         <nav>
-          <a href="#">Início</a>
-          <a className="active" href="#">Agendar</a>
-          <a href="#">Agenda</a>
-          <a href="#">Clientes</a>
-          <a href="#">Profissionais</a>
+          <Link to="/">Início</Link>
+          <Link to="/agendar">Agendar</Link>
+          <Link to="/agenda">Agenda</Link>
+          <Link to="/clientes">Clientes</Link>
+          <Link to="/profissionais">Profissionais</Link>
         </nav>
 
-        <button className="login-btn">Login</button>
+        <Link to="/login" className="login-btn">Login</Link>
       </header>
 
-      <main className="container">
-        <section className="hero">
-          <div className="hero-content">
-            <p className="tag">— AGENDAMENTO ONLINE</p>
-            <h2>Seu horário,<br /><span>do seu jeito.</span></h2>
-            <p className="desc">
-              Agende de forma rápida e fácil com seu profissional favorito.
-            </p>
-          </div>
-
-          <div className="benefits">
-            <div>🛡️ <span>Profissionais<br />Qualificados</span></div>
-            <div>🕒 <span>Agendamento<br />Rápido</span></div>
-            <div>⭐ <span>Atendimento<br />Premium</span></div>
-          </div>
-        </section>
-
-        <section className="form-card">
-          <div className="form-title">
-            <div className="calendar">📅</div>
-            <div>
-              <h2>Novo Agendamento</h2>
-              <p>Preencha os dados abaixo para reservar um horário.</p>
-            </div>
-          </div>
-
-          <form>
-            <label>Seu Nome</label>
-            <input type="text" placeholder="Digite seu nome completo" />
-
-            <label>Escolha o Barbeiro</label>
-            <select>
-              <option>Selecione um profissional</option>
-              <option>Alberth Maquininha</option>
-              <option>Felipe Mandrake</option>
-              <option>Kayo Navalha</option>
-              <option>Ramon Gilete</option>
-            </select>
-
-            <label>Escolha o Serviço</label>
-            <select>
-              <option>Selecione o serviço</option>
-              <option>Corte masculino</option>
-              <option>Barba</option>
-              <option>Corte + Barba</option>
-            </select>
-
-            <div className="row">
-              <div>
-                <label>Data</label>
-                <input type="date" />
-              </div>
-
-              <div>
-                <label>Horário</label>
-                <input type="time" />
-              </div>
-            </div>
-
-            <button type="submit" className="submit-btn">
-              Confirmar Agendamento
-            </button>
-          </form>
-        </section>
-      </main>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/agendar" element={<Agendar />} />
+        <Route path="/agenda" element={<Agenda />} />
+        <Route path="/clientes" element={<Clientes />} />
+        <Route path="/profissionais" element={<Profissionais />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
     </>
   );
 }
