@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { cadastrarCliente } from '../services/api';
 
 function FormCliente() {
   const [form, setForm] = useState({
@@ -14,10 +15,22 @@ function FormCliente() {
     });
   }
 
-  function enviarFormulario(e) {
+  async function enviarFormulario(e) {
     e.preventDefault();
-    console.log('Cliente:', form);
-    alert('Cliente cadastrado com sucesso!');
+
+    try {
+      await cadastrarCliente(form);
+      alert('Cliente cadastrado com sucesso!');
+
+      setForm({
+        nome: '',
+        email: '',
+        telefone: ''
+      });
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao cadastrar cliente.');
+    }
   }
 
   return (
