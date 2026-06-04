@@ -8,7 +8,7 @@ function App() {
           <div className="logo-icon">CF</div>
           <div>
             <h1>CORTEFOLIO</h1>
-            <span>SEU ESTILO, NOSSA ARTE</span>
+            <span>SEU CORTE, SUA IDENTIDADE</span>
           </div>
         </div>
 
@@ -34,7 +34,7 @@ function App() {
             </h2>
 
             <p className="desc">
-              Agende de forma rápida e fácil com seu profissional favorito.
+              Agende de forma rápida e fácil seu corte.
             </p>
           </div>
 
@@ -75,10 +75,10 @@ function App() {
             <label>Escolha o Barbeiro</label>
             <select>
               <option>Selecione um profissional</option>
-              <option>Alberth Maquininha</option>
-              <option>Felipe Mandrake</option>
-              <option>Kayo Navalha</option>
-              <option>Ramon Gilete</option>
+              <option>Alberth </option>
+              <option>Felipe </option>
+              <option>Kayo </option>
+              <option>Ramon </option>
             </select>
 
             <label>Escolha o Serviço</label>
