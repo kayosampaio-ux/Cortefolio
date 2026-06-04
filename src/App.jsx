@@ -108,6 +108,21 @@ function App() {
     alert('E-mail ou senha incorretos, ou você não tem permissão de Administrador.');
   };
 
+  // Função auxiliar para extrair o valor numérico do texto do serviço (ex: "Corte - R$ 30,00" -> 30)
+  const extrairPreco = (textoServico) => {
+    if (!textoServico) return 0;
+    const partes = textoServico.split('R$');
+    if (partes.length < 2) return 0;
+    // Pega a parte após o R$, remove espaços e troca vírgula por ponto
+    const valorLimpo = partes[1].trim().replace(',', '.');
+    return parseFloat(valorLimpo) || 0;
+  };
+
+  // Calcula o faturamento geral somando todos os serviços reais da lista
+  const faturamentoGeral = listaAgendamentos.reduce((total, item) => {
+    return total + extrairPreco(item.servico);
+  }, 0);
+
   return (
     <>
       <header className="header">
@@ -195,8 +210,8 @@ function App() {
                 <select value={agendServico} onChange={(e) => setAgendServico(e.target.value)} required>
                   <option value="">Selecione o serviço</option>
                   <option>Corte masculino - R$ 30,00</option>
-                  <option>Barba - R$15,00</option>
-                  <option>Corte + Barba - R$45,00</option>
+                  <option>Barba - R$ 15,00</option>
+                  <option>Corte + Barba - R$ 45,00</option>
                   <option>Pezinho - R$ 5,00</option>
                   <option>Pigmentação - R$ 8,00</option>
                 </select>
@@ -292,14 +307,42 @@ function App() {
                 <p className="metric-number">{listaAgendamentos.length}</p>
               </div>
               <div className="metric-card border-green">
-                <h3>Faturamento Estimado</h3>
+                <h3>Faturamento Real</h3>
                 <p className="metric-number text-green">
-                  R$ {listaAgendamentos.length * 35},00
+                  R$ {faturamentoGeral.toFixed(2).replace('.', ',')}
                 </p>
               </div>
               <div className="metric-card border-blue">
                 <h3>Barbeiros Ativos</h3>
                 <p className="metric-number">4</p>
+              </div>
+            </div>
+
+            {/* NOVA SEÇÃO: Lucros Individuais Separados */}
+            <div className="table-card" style={{ marginBottom: '30px' }}>
+              <h3 className="table-title">💰 Faturamento por Barbeiro</h3>
+              <div className="barber-lucro-grid">
+                {['Alberth Tailon', 'Felipe Leal', 'Kayo Mario', 'Ramon Jesus'].map((barbeiro) => {
+                  const agendamentosDoBarbeiro = listaAgendamentos.filter(item => item.barbeiro === barbeiro);
+                  const lucroIndividual = agendamentosDoBarbeiro.reduce((total, item) => {
+                    return total + extrairPreco(item.servico);
+                  }, 0);
+
+                  return (
+                    <div key={barbeiro} className="barber-lucro-card">
+                      <div className="barber-info">
+                        <span className="barber-icon">✂️</span>
+                        <div>
+                          <h4>{barbeiro}</h4>
+                          <p>{agendamentosDoBarbeiro.length} {agendamentosDoBarbeiro.length === 1 ? 'atendimento' : 'atendimentos'}</p>
+                        </div>
+                      </div>
+                      <span className="barber-value">
+                        R$ {lucroIndividual.toFixed(2).replace('.', ',')}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
