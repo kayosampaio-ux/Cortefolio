@@ -1,69 +1,57 @@
-const API_URL = 'http://localhost:3001/api';
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "http://localhost:3001/api",
+});
+
+export default api;
 
 // PROFISSIONAIS
 export async function listarProfissionais() {
-  const response = await fetch(`${API_URL}/profissionais`);
-  return response.json();
+  const response = await api.get("/profissionais");
+  return response.data;
 }
 
 // SERVIÇOS
 export async function listarServicos() {
-  const response = await fetch(`${API_URL}/servicos`);
-  return response.json();
+  const response = await api.get("/servicos");
+  return response.data;
 }
 
 // CLIENTES
 export async function listarClientes() {
-  const response = await fetch(`${API_URL}/clientes`);
-  return response.json();
+  const response = await api.get("/clientes");
+  return response.data;
 }
 
 export async function cadastrarCliente(cliente) {
-  const response = await fetch(`${API_URL}/clientes`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(cliente),
-  });
-
-  return response.json();
+  const response = await api.post("/clientes", cliente);
+  return response.data;
 }
 
 // AGENDAMENTOS
 export async function listarAgendamentos() {
-  const response = await fetch(`${API_URL}/agendamentos`);
-  return response.json();
+  const response = await api.get("/agendamentos");
+  return response.data;
 }
 
 export async function criarAgendamento(agendamento) {
-  const response = await fetch(`${API_URL}/agendamentos`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(agendamento),
-  });
-
-  return response.json();
+  const response = await api.post("/agendamentos", agendamento);
+  return response.data;
 }
 
 export async function atualizarAgendamento(id, dados) {
-  const response = await fetch(`${API_URL}/agendamentos/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(dados),
-  });
-
-  return response.json();
+  const response = await api.put(`/agendamentos/${id}`, dados);
+  return response.data;
 }
 
 export async function excluirAgendamento(id) {
-  const response = await fetch(`${API_URL}/agendamentos/${id}`, {
-    method: 'DELETE',
-  });
+  const response = await api.delete(`/agendamentos/${id}`);
+  return response.data;
+}
 
-  return response.json();
+// LOGIN
+export async function loginUsuario(dados) {
+  const response = await api.post("/auth/login", dados);
+  return response.data;
 }
