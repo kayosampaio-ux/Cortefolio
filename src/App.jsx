@@ -3,7 +3,7 @@ import './App.css';
 
 function App() {
   // Estado para controlar qual tela está ativa.
-  const [telaAtiva, setTelaAtiva] = useState('agendar');
+  const [telaAtiva, setTelaAtiva] = useState('inicio'); // Mudou para 'inicio' para ser a recepção
 
   // Estados para capturar os dados digitados nos formulários de Login/Cadastro
   const [loginEmail, setLoginEmail] = useState('');
@@ -23,12 +23,17 @@ function App() {
   // Estado que guarda a lista de agendamentos reais
   const [listaAgendamentos, setListaAgendamentos] = useState([]);
 
-  // Carrega os agendamentos já salvos ao abrir o app
+  // NOVO ESTADO: Guarda o usuário que está logado atualmente na sessão
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
+
+  // Carrega os agendamentos e verifica se já existe alguém logado ao abrir o app
   useEffect(() => {
     const salvos = localStorage.getItem('agendamentosCortefolio');
     if (salvos) {
       setListaAgendamentos(JSON.parse(salvos));
     }
+
+    // Verifica se existe uma sessão ativa (pode ser expandido depois se quiser salvar o estado de login)
   }, []);
 
   // Função para salvar um novo agendamento
@@ -88,6 +93,7 @@ function App() {
       alert('Acesso concedido! Bem-vindo ao Painel Administrativo.');
       setLoginEmail('');
       setLoginSenha('');
+      setUsuarioLogado({ nome: 'Administrador', tipo: 'admin' });
       setTelaAtiva('admin'); 
       return;
     }
@@ -100,7 +106,9 @@ function App() {
         alert(`Olá, ${dadosUsuario.nome}! Você logou como cliente.`);
         setLoginEmail('');
         setLoginSenha('');
-        setTelaAtiva('inicio'); 
+        setUsuarioLogado(dadosUsuario); // Salva o objeto do usuário logado no estado
+        setAgendNome(dadosUsuario.nome); // Auto-preenche o nome dele no formulário de agendamento!
+        setTelaAtiva('agendar'); // Manda ele direto para a tela de agendamento após o login
         return;
       }
     }
@@ -108,12 +116,29 @@ function App() {
     alert('E-mail ou senha incorretos, ou você não tem permissão de Administrador.');
   };
 
-  // Função auxiliar para extrair o valor numérico do texto do serviço (ex: "Corte - R$ 30,00" -> 30)
+  // FUNÇÃO DE REGRAS DE NAVEGAÇÃO (Bloqueia telas se não estiver logado)
+  const navegarPara = (tela) => {
+    if (tela === 'agendar' && !usuarioLogado) {
+      alert('Por favor, faça login ou cadastre-se para realizar um agendamento.');
+      setTelaAtiva('login');
+      return;
+    }
+    setTelaAtiva(tela);
+  };
+
+  // Função para deslogar (Logout)
+  const fazerLogout = () => {
+    setUsuarioLogado(null);
+    setAgendNome('');
+    setTelaAtiva('inicio');
+    alert('Sessão encerrada com sucesso.');
+  };
+
+  // Função auxiliar para extrair o valor numérico do texto do serviço
   const extrairPreco = (textoServico) => {
     if (!textoServico) return 0;
     const partes = textoServico.split('R$');
     if (partes.length < 2) return 0;
-    // Pega a parte após o R$, remove espaços e troca vírgula por ponto
     const valorLimpo = partes[1].trim().replace(',', '.');
     return parseFloat(valorLimpo) || 0;
   };
@@ -126,7 +151,7 @@ function App() {
   return (
     <>
       <header className="header">
-        <div className="logo" onClick={() => setTelaAtiva('inicio')}>
+        <div className="logo" onClick={() => navegarPara('inicio')}>
           <div className="logo-icon">CF</div>
           <div>
             <h1>CORTEFOLIO</h1>
@@ -135,24 +160,30 @@ function App() {
         </div>
 
         <nav>
-          <a className={telaAtiva === 'inicio' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('inicio'); }}>Início</a>
-          <a className={telaAtiva === 'agendar' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('agendar'); }}>Agendar</a>
-          <a className={telaAtiva === 'clientes' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('clientes'); }}>Clientes</a>
-          <a className={telaAtiva === 'profissionais' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('profissionais'); }}>Profissionais</a>
+          <a className={telaAtiva === 'inicio' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('inicio'); }}>Início</a>
+          <a className={telaAtiva === 'agendar' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('agendar'); }}>Agendar</a>
+          <a className={telaAtiva === 'clientes' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('clientes'); }}>Clientes</a>
+          <a className={telaAtiva === 'profissionais' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('profissionais'); }}>Profissionais</a>
         </nav>
 
-        <button 
-          className={`login-btn ${telaAtiva === 'login' || telaAtiva === 'cadastro' ? 'active-btn' : ''}`}
-          onClick={() => {
-            if (telaAtiva === 'admin') {
-              setTelaAtiva('agendar'); 
-            } else {
-              setTelaAtiva('login');
-            }
-          }}
-        >
-          {telaAtiva === 'admin' ? 'Sair (Logout)' : 'Login'}
-        </button>
+        {/* Botão Dinâmico de Login / Logout */}
+        {usuarioLogado ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <span style={{ color: '#d4a72c', fontSize: '14px', fontWeight: 'bold' }}>
+              Olá, {usuarioLogado.nome.split(' ')[0]}!
+            </span>
+            <button className="login-btn" onClick={fazerLogout}>
+              Sair
+            </button>
+          </div>
+        ) : (
+          <button 
+            className={`login-btn ${telaAtiva === 'login' || telaAtiva === 'cadastro' ? 'active-btn' : ''}`}
+            onClick={() => setTelaAtiva('login')}
+          >
+            Login
+          </button>
+        )}
       </header>
 
       <main className="container">
@@ -167,8 +198,8 @@ function App() {
           </section>
         )}
 
-        {/* TELA DE AGENDAR */}
-        {telaAtiva === 'agendar' && (
+        {/* TELA DE AGENDAR (PROTEGIDA POR LOGIN) */}
+        {telaAtiva === 'agendar' && usuarioLogado && (
           <>
             <section className="hero">
               <div className="hero-content">
@@ -195,7 +226,8 @@ function App() {
 
               <form onSubmit={lidarComAgendamento}>
                 <label>Seu Nome</label>
-                <input type="text" placeholder="Digite seu nome completo" value={agendNome} onChange={(e) => setAgendNome(e.target.value)} required />
+                {/* Campo desabilitado ou preenchido automaticamente com o nome do login */}
+                <input type="text" placeholder="Digite seu nome completo" value={agendNome} onChange={(e) => setAgendNome(e.target.value)} disabled required />
 
                 <label>Escolha o Barbeiro</label>
                 <select value={agendBarbeiro} onChange={(e) => setAgendBarbeiro(e.target.value)} required>
@@ -294,7 +326,7 @@ function App() {
         )}
 
         {/* TELA PAINEL ADMIN (DASHBOARD) - PROTEGIDA */}
-        {telaAtiva === 'admin' && (
+        {telaAtiva === 'admin' && usuarioLogado?.tipo === 'admin' && (
           <section className="admin-container">
             <div className="admin-header">
               <h2>📊 Painel Administrativo (Barbeiro)</h2>
@@ -318,7 +350,7 @@ function App() {
               </div>
             </div>
 
-            {/* NOVA SEÇÃO: Lucros Individuais Separados */}
+            {/* Lucros Individuais Separados */}
             <div className="table-card" style={{ marginBottom: '30px' }}>
               <h3 className="table-title">💰 Faturamento por Barbeiro</h3>
               <div className="barber-lucro-grid">
