@@ -417,14 +417,107 @@ function App() {
           </section>
         )}
 
-        {/* OUTRAS TELAS SECUNDÁRIAS */}
+        {/* TELA DE CLIENTES - HISTÓRICO COMPLETO */}
         {telaAtiva === 'clientes' && (
-          <section className="hero-content">
-            <h2>👥 Lista de Clientes</h2>
-            <p className="desc">Aqui ficará o histórico de clientes da barbearia.</p>
+          <section className="admin-container">
+            <div className="admin-header">
+              <h2>👥 Histórico e Lista de Clientes</h2>
+              <p>Controle de frequência e dados de contacto dos clientes cadastrados ou agendados.</p>
+            </div>
+
+            {(() => {
+              // Agrupa os agendamentos por cliente de forma dinâmica
+              const clientesAgrupados = listaAgendamentos.reduce((acc, item) => {
+                const nomeCliente = item.cliente || 'Cliente Anônimo';
+                const preco = extrairPreco(item.servico);
+
+                if (!acc[nomeCliente]) {
+                  acc[nomeCliente] = {
+                    nome: nomeCliente,
+                    totalAgendamentos: 0,
+                    totalGasto: 0,
+                    telefone: '(71) 99999-9999' // Valor padrão caso não encontre cadastro
+                  };
+
+                  // Tenta buscar o telefone real do localStorage se bater com o nome do cliente logado/salvo
+                  const usuarioSalvo = localStorage.getItem('usuarioCortefolio');
+                  if (usuarioSalvo) {
+                    const dadosUser = JSON.parse(usuarioSalvo);
+                    if (dadosUser.nome.toLowerCase() === nomeCliente.toLowerCase()) {
+                      acc[nomeCliente].telefone = dadosUser.telefone;
+                    }
+                  }
+                }
+
+                acc[nomeCliente].totalAgendamentos += 1;
+                acc[nomeCliente].totalGasto += preco;
+                return acc;
+              }, {});
+
+              const listaClientesUnicos = Object.values(clientesAgrupados);
+
+              return (
+                <>
+                  {/* Cards de Métricas na Tela de Clientes */}
+                  <div className="metrics-grid">
+                    <div className="metric-card border-gold">
+                      <h3>Clientes Registrados</h3>
+                      <p className="metric-number">{listaClientesUnicos.length}</p>
+                    </div>
+                    <div className="metric-card border-blue">
+                      <h3>Mais Frequente</h3>
+                      <p className="metric-number" style={{ fontSize: '20px', marginTop: '14px' }}>
+                        {listaClientesUnicos.length > 0 
+                          ? listaClientesUnicos.sort((a,b) => b.totalAgendamentos - a.totalAgendamentos)[0].nome 
+                          : 'Nenhum'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Tabela de Histórico */}
+                  <div className="table-card">
+                    <h3 className="table-title">📋 Clientes Encontrados</h3>
+                    
+                    {listaClientesUnicos.length === 0 ? (
+                      <p className="no-data">Nenhum cliente realizou agendamentos ainda.</p>
+                    ) : (
+                      <div className="responsive-table-wrapper">
+                        <table className="admin-table">
+                          <thead>
+                            <tr>
+                              <th>Nome do Cliente</th>
+                              <th>Contato / WhatsApp</th>
+                              <th>Total de Visitas</th>
+                              <th>Total Investido</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {listaClientesUnicos.map((cliente, index) => (
+                              <tr key={index}>
+                                <td style={{ fontWeight: 'bold', color: '#fff' }}>{cliente.nome}</td>
+                                <td>{cliente.telefone}</td>
+                                <td>
+                                  <span className="status-label" style={{ backgroundColor: 'rgba(212, 167, 44, 0.15)', color: '#d4a72c', borderColor: 'rgba(212, 167, 44, 0.3)' }}>
+                                    {cliente.totalAgendamentos} {cliente.totalAgendamentos === 1 ? 'visita' : 'visitas'}
+                                  </span>
+                                </td>
+                                <td style={{ color: '#00cc66', fontWeight: 'bold' }}>
+                                  R$ {cliente.totalGasto.toFixed(2).replace('.', ',')}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
           </section>
         )}
 
+        {/* TELA DE PROFISSIONAIS */}
         {telaAtiva === 'profissionais' && (
           <section className="hero-content">
             <h2>✂️ Nossos Profissionais</h2>
