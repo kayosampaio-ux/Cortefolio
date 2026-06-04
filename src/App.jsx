@@ -5,6 +5,66 @@ function App() {
   // Estado para controlar qual tela está ativa.
   const [telaAtiva, setTelaAtiva] = useState('agendar');
 
+  // Estados para capturar os dados digitados nos formulários
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginSenha, setLoginSenha] = useState('');
+
+  const [cadNome, setCadNome] = useState('');
+  const [cadTelefone, setCadTelefone] = useState('');
+  const [cadEmail, setCadEmail] = useState('');
+  const [cadSenha, setCadSenha] = useState('');
+
+  // Função para lidar com o Cadastro
+  const lidarComCadastro = (e) => {
+    e.preventDefault();
+
+    // Cria um objeto com os dados do novo usuário
+    const novoUsuario = {
+      nome: cadNome,
+      telefone: cadTelefone,
+      email: cadEmail.toLowerCase(),
+      senha: cadSenha
+    };
+
+    // Salva no localStorage do navegador convertendo para texto
+    localStorage.setItem('usuarioCortefolio', JSON.stringify(novoUsuario));
+
+    alert('Cadastro realizado com sucesso! Agora faça o seu login.');
+    
+    // Limpa o formulário de cadastro e joga para o login
+    setCadNome('');
+    setCadTelefone('');
+    setCadEmail('');
+    setCadSenha('');
+    setTelaAtiva('login');
+  };
+
+  // Função para lidar com o Login
+  const lidarComLogin = (e) => {
+    e.preventDefault();
+
+    // Busca o usuário salvo no localStorage
+    const usuarioSalvo = localStorage.getItem('usuarioCortefolio');
+
+    if (!usuarioSalvo) {
+      alert('Nenhum usuário cadastrado neste navegador! Por favor, cadastre-se primeiro.');
+      return;
+    }
+
+    // Converte o texto de volta para objeto do JavaScript
+    const dadosUsuario = JSON.parse(usuarioSalvo);
+
+    // Valida se o email e a senha batem perfeitamente
+    if (loginEmail.toLowerCase() === dadosUsuario.email && loginSenha === dadosUsuario.senha) {
+      alert(`Bem-vindo de volta, ${dadosUsuario.nome}!`);
+      setLoginEmail('');
+      setLoginSenha('');
+      setTelaAtiva('inicio'); // Login com sucesso, vai para o Início
+    } else {
+      alert('E-mail ou senha incorretos! Tente novamente.');
+    }
+  };
+
   return (
     <>
       <header className="header">
@@ -54,7 +114,6 @@ function App() {
           </a>
         </nav>
 
-        {/* Botão de Login mudando o estado para a tela de login (ativo para login ou cadastro) */}
         <button 
           className={`login-btn ${telaAtiva === 'login' || telaAtiva === 'cadastro' ? 'active-btn' : ''}`}
           onClick={() => setTelaAtiva('login')}
@@ -152,12 +211,24 @@ function App() {
               </div>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); alert('Login efetuado com sucesso!'); setTelaAtiva('inicio'); }}>
+            <form onSubmit={lidarComLogin}>
               <label>E-mail ou Usuário</label>
-              <input type="email" placeholder="exemplo@email.com" required />
+              <input 
+                type="email" 
+                placeholder="exemplo@email.com" 
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                required 
+              />
 
               <label>Senha</label>
-              <input type="password" placeholder="Digite sua senha" required />
+              <input 
+                type="password" 
+                placeholder="Digite sua senha" 
+                value={loginSenha}
+                onChange={(e) => setLoginSenha(e.target.value)}
+                required 
+              />
 
               <button type="submit" className="submit-btn" style={{ marginTop: '20px' }}>
                 Entrar
@@ -196,18 +267,42 @@ function App() {
               </div>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); alert('Cadastro realizado com sucesso!'); setTelaAtiva('login'); }}>
+            <form onSubmit={lidarComCadastro}>
               <label>Nome Completo</label>
-              <input type="text" placeholder="Digite seu nome completo" required />
+              <input 
+                type="text" 
+                placeholder="Digite seu nome completo" 
+                value={cadNome}
+                onChange={(e) => setCadNome(e.target.value)}
+                required 
+              />
 
               <label>Telefone / WhatsApp</label>
-              <input type="tel" placeholder="(71) 99999-9999" required />
+              <input 
+                type="tel" 
+                placeholder="(71) 99999-9999" 
+                value={cadTelefone}
+                onChange={(e) => setCadTelefone(e.target.value)}
+                required 
+              />
 
               <label>E-mail</label>
-              <input type="email" placeholder="seuemail@exemplo.com" required />
+              <input 
+                type="email" 
+                placeholder="seuemail@exemplo.com" 
+                value={cadEmail}
+                onChange={(e) => setCadEmail(e.target.value)}
+                required 
+              />
 
               <label>Senha</label>
-              <input type="password" placeholder="Crie uma senha forte" required />
+              <input 
+                type="password" 
+                placeholder="Crie uma senha forte" 
+                value={cadSenha}
+                onChange={(e) => setCadSenha(e.target.value)}
+                required 
+              />
 
               <button type="submit" className="submit-btn" style={{ marginTop: '20px' }}>
                 Finalizar Cadastro
