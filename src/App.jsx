@@ -114,10 +114,10 @@ function App() {
                 <label>Escolha o Barbeiro</label>
                 <select required>
                   <option value="">Selecione um profissional</option>
-                  <option>Alberth</option>
-                  <option>Felipe</option>
-                  <option>Kayo</option>
-                  <option>Ramon</option>
+                  <option>Alberth Tailon</option>
+                  <option>Felipe Leal</option>
+                  <option>Kayo Mario</option>
+                  <option>Ramon Jesus</option>
                 </select>
 
                 <label>Escolha o Serviço</label>
