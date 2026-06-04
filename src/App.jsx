@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import logo from './assets/logo-icon.png';
 
 function App() {
   // Estado para controlar qual tela está ativa.
@@ -157,27 +158,26 @@ function App() {
   return (
     <>
       <header className="header">
-        <div className="logo" onClick={() => navegarPara('inicio')}>
-          <div className="logo-icon">CF</div>
-          <div>
-            <h1>CORTEFOLIO</h1>
-            <span>SEU CORTE, SUA IDENTIDADE</span>
-          </div>
+        <he className="logo" onClick={() => navegarPara('inicio')}>
+          <div className="logo-icon">
+        <img src={logo} alt="Cortefolio" />
         </div>
+        </he>
 
         <nav>
           <a className={telaAtiva === 'inicio' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('inicio'); }}>Início</a>
           <a className={telaAtiva === 'agendar' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('agendar'); }}>Agendar</a>
           
+          
           {/* Menu de Clientes visível idealmente para o Admin */}
           {usuarioLogado?.tipo === 'admin' && (
-            <a className={telaAtiva === 'clientes' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('clientes'); }}>Clientes</a>
+            <a className={telaAtiva === 'admin' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('admin'); }}>Painel Admin</a>
           )}
           
           <a className={telaAtiva === 'profissionais' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('profissionais'); }}>Profissionais</a>
         </nav>
-
-        {/* Botão Dinâmico de Login / Logout */}
+        
+          {/* Botão Dinâmico de Login / Logout */}
         {usuarioLogado ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             <span style={{ color: '#d4a72c', fontSize: '14px', fontWeight: 'bold' }}>
@@ -335,14 +335,10 @@ function App() {
           </section>
         )}
 
-        {/* TELA PAINEL ADMIN (DASHBOARD) - PROTEGIDA */}
+        {/* TELA DE ADMIN - PROTEGIDA EXCLUSIVAMENTE PARA O ADM */}
         {telaAtiva === 'admin' && usuarioLogado?.tipo === 'admin' && (
           <section className="admin-container">
-            <div className="admin-header">
-              <h2>📊 Painel Administrativo (Barbeiro)</h2>
-              <p>Visualização exclusiva da gerência e controle de fluxo.</p>
-            </div>
-            
+
             <div className="metrics-grid">
               <div className="metric-card border-gold">
                 <h3>Total de Agendamentos</h3>

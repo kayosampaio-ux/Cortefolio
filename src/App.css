@@ -5,8 +5,11 @@
 }
 
 body {
-  background: #08090b;
-  color: #fff;
+  min-height: 100vh;
+  background:
+    linear-gradient(to right, rgba(0,0,0,.65), rgba(8,9,11,.20)),
+    url('./assets/barbearia.jpg') center top / 100% 100% no-repeat;
+  color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -16,10 +19,18 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #101114;
-  border-bottom: 1px solid #2b2414;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 2px solid transparent;
 }
 
+.container {
+  min-height: calc(100vh - 90px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: transparent;
+  padding: 70px 95px;
+  gap: 60px;
+}
 .logo {
   display: flex;
   align-items: center;
@@ -89,7 +100,7 @@ nav a.active {
   display: grid;
   grid-template-columns: 1fr 1fr;
   background:
-    linear-gradient(to right, rgba(0,0,0,.35), #08090b 58%),
+    linear-gradient(to right, rgba(0, 0, 0, 0), #08090b54 58%),
     url('./assets/barbearia.jpg');
   background-size: cover;
   background-position: center;
@@ -173,6 +184,12 @@ nav a.active {
   text-align: center; 
   margin-top: 15px; 
   font-size: 14px;
+}
+
+.logo img {
+  height: 60px;
+  width: auto;
+  cursor: pointer;
 }
 
 .auth-toggle-text span {
