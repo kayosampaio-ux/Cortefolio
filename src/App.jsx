@@ -108,10 +108,10 @@ function App() {
                 <label>Escolha o Barbeiro</label>
                 <select required>
                   <option value="">Selecione um profissional</option>
-                  <option>Alberth</option>
-                  <option>Felipe</option>
-                  <option>Kayo</option>
-                  <option>Ramon</option>
+                  <option>Alberth Tailon</option>
+                  <option>Felipe Leal</option>
+                  <option>Kayo Mario</option>
+                  <option>Ramon Jesus</option>
                 </select>
 
                 <label>Escolha o Serviço</label>
@@ -119,7 +119,7 @@ function App() {
                   <option value="">Selecione o serviço</option>
                   <option>Corte masculino - R$ 30,00</option>
                   <option>Barba - R$15,00</option>
-                  <option>Corte + Barba</option>
+                  <option>Corte + Barba - R$45,00</option>
                   <option>Pezinho - R$ 5,00</option>
                   <option>Pigmentação - R$ 8,00</option>
                 </select>
