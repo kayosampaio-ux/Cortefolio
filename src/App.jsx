@@ -3,7 +3,7 @@ import './App.css';
 
 function App() {
   // Estado para controlar qual tela está ativa.
-  const [telaAtiva, setTelaAtiva] = useState('inicio'); // Mudou para 'inicio' para ser a recepção
+  const [telaAtiva, setTelaAtiva] = useState('inicio'); 
 
   // Estados para capturar os dados digitados nos formulários de Login/Cadastro
   const [loginEmail, setLoginEmail] = useState('');
@@ -23,17 +23,15 @@ function App() {
   // Estado que guarda a lista de agendamentos reais
   const [listaAgendamentos, setListaAgendamentos] = useState([]);
 
-  // NOVO ESTADO: Guarda o usuário que está logado atualmente na sessão
+  // Guarda o usuário que está logado atualmente na sessão
   const [usuarioLogado, setUsuarioLogado] = useState(null);
 
-  // Carrega os agendamentos e verifica se já existe alguém logado ao abrir o app
+  // Carrega os agendamentos ao abrir o app
   useEffect(() => {
     const salvos = localStorage.getItem('agendamentosCortefolio');
     if (salvos) {
       setListaAgendamentos(JSON.parse(salvos));
     }
-
-    // Verifica se existe uma sessão ativa (pode ser expandido depois se quiser salvar o estado de login)
   }, []);
 
   // Função para salvar um novo agendamento
@@ -106,9 +104,9 @@ function App() {
         alert(`Olá, ${dadosUsuario.nome}! Você logou como cliente.`);
         setLoginEmail('');
         setLoginSenha('');
-        setUsuarioLogado(dadosUsuario); // Salva o objeto do usuário logado no estado
-        setAgendNome(dadosUsuario.nome); // Auto-preenche o nome dele no formulário de agendamento!
-        setTelaAtiva('agendar'); // Manda ele direto para a tela de agendamento após o login
+        setUsuarioLogado(dadosUsuario); 
+        setAgendNome(dadosUsuario.nome); 
+        setTelaAtiva('agendar'); 
         return;
       }
     }
@@ -116,13 +114,21 @@ function App() {
     alert('E-mail ou senha incorretos, ou você não tem permissão de Administrador.');
   };
 
-  // FUNÇÃO DE REGRAS DE NAVEGAÇÃO (Bloqueia telas se não estiver logado)
+  // REGRAS DE NAVEGAÇÃO COMPLETA (Protege Agendamentos e Histórico de Clientes)
   const navegarPara = (tela) => {
     if (tela === 'agendar' && !usuarioLogado) {
       alert('Por favor, faça login ou cadastre-se para realizar um agendamento.');
       setTelaAtiva('login');
       return;
     }
+    
+    // TRAVA DO HISTÓRICO: Se tentar ir para clientes e não for Admin, bloqueia
+    if (tela === 'clientes' && usuarioLogado?.tipo !== 'admin') {
+      alert('Acesso negado. Apenas o Administrador pode visualizar o histórico de clientes.');
+      setTelaAtiva('inicio');
+      return;
+    }
+
     setTelaAtiva(tela);
   };
 
@@ -143,7 +149,7 @@ function App() {
     return parseFloat(valorLimpo) || 0;
   };
 
-  // Calcula o faturamento geral somando todos os serviços reais da lista
+  // Calcula o faturamento geral
   const faturamentoGeral = listaAgendamentos.reduce((total, item) => {
     return total + extrairPreco(item.servico);
   }, 0);
@@ -162,7 +168,12 @@ function App() {
         <nav>
           <a className={telaAtiva === 'inicio' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('inicio'); }}>Início</a>
           <a className={telaAtiva === 'agendar' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('agendar'); }}>Agendar</a>
-          <a className={telaAtiva === 'clientes' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('clientes'); }}>Clientes</a>
+          
+          {/* Menu de Clientes visível idealmente para o Admin */}
+          {usuarioLogado?.tipo === 'admin' && (
+            <a className={telaAtiva === 'clientes' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('clientes'); }}>Clientes</a>
+          )}
+          
           <a className={telaAtiva === 'profissionais' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); navegarPara('profissionais'); }}>Profissionais</a>
         </nav>
 
@@ -226,7 +237,6 @@ function App() {
 
               <form onSubmit={lidarComAgendamento}>
                 <label>Seu Nome</label>
-                {/* Campo desabilitado ou preenchido automaticamente com o nome do login */}
                 <input type="text" placeholder="Digite seu nome completo" value={agendNome} onChange={(e) => setAgendNome(e.target.value)} disabled required />
 
                 <label>Escolha o Barbeiro</label>
@@ -417,8 +427,8 @@ function App() {
           </section>
         )}
 
-        {/* TELA DE CLIENTES - HISTÓRICO COMPLETO */}
-        {telaAtiva === 'clientes' && (
+        {/* TELA DE CLIENTES - PROTEGIDA EXCLUSIVAMENTE PARA O ADM */}
+        {telaAtiva === 'clientes' && usuarioLogado?.tipo === 'admin' && (
           <section className="admin-container">
             <div className="admin-header">
               <h2>👥 Histórico e Lista de Clientes</h2>
@@ -426,7 +436,6 @@ function App() {
             </div>
 
             {(() => {
-              // Agrupa os agendamentos por cliente de forma dinâmica
               const clientesAgrupados = listaAgendamentos.reduce((acc, item) => {
                 const nomeCliente = item.cliente || 'Cliente Anônimo';
                 const preco = extrairPreco(item.servico);
@@ -436,10 +445,9 @@ function App() {
                     nome: nomeCliente,
                     totalAgendamentos: 0,
                     totalGasto: 0,
-                    telefone: '(71) 99999-9999' // Valor padrão caso não encontre cadastro
+                    telefone: '(71) 99999-9999' 
                   };
 
-                  // Tenta buscar o telefone real do localStorage se bater com o nome do cliente logado/salvo
                   const usuarioSalvo = localStorage.getItem('usuarioCortefolio');
                   if (usuarioSalvo) {
                     const dadosUser = JSON.parse(usuarioSalvo);
@@ -458,7 +466,6 @@ function App() {
 
               return (
                 <>
-                  {/* Cards de Métricas na Tela de Clientes */}
                   <div className="metrics-grid">
                     <div className="metric-card border-gold">
                       <h3>Clientes Registrados</h3>
@@ -474,7 +481,6 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Tabela de Histórico */}
                   <div className="table-card">
                     <h3 className="table-title">📋 Clientes Encontrados</h3>
                     
