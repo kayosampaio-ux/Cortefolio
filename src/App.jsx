@@ -54,9 +54,9 @@ function App() {
           </a>
         </nav>
 
-        {/* Botão de Login mudando o estado para a tela de login */}
+        {/* Botão de Login mudando o estado para a tela de login (ativo para login ou cadastro) */}
         <button 
-          className={`login-btn ${telaAtiva === 'login' ? 'active-btn' : ''}`}
+          className={`login-btn ${telaAtiva === 'login' || telaAtiva === 'cadastro' ? 'active-btn' : ''}`}
           onClick={() => setTelaAtiva('login')}
         >
           Login
@@ -163,14 +163,65 @@ function App() {
                 Entrar
               </button>
               
+              <p style={{ color: '#fff', textAlign: 'center', marginTop: '15px', fontSize: '14px' }}>
+                Não tem uma conta?{' '}
+                <span 
+                  style={{ color: '#ffcc00', cursor: 'pointer', textDecoration: 'underline', fontWeight: 'bold' }} 
+                  onClick={() => setTelaAtiva('cadastro')}
+                >
+                  Cadastre-se aqui
+                </span>
+              </p>
+
               <button 
                 type="button" 
                 className="submit-btn" 
-                style={{ backgroundColor: 'transparent', border: '1px solid #ffcc00', color: '#ffcc00', marginTop: '10px' }}
+                style={{ backgroundColor: 'transparent', border: '1px solid #ffcc00', color: '#ffcc00', marginTop: '15px' }}
                 onClick={() => setTelaAtiva('agendar')}
               >
                 Cancelar
               </button>
+            </form>
+          </section>
+        )}
+
+        {/* TELA DE CADASTRO */}
+        {telaAtiva === 'cadastro' && (
+          <section className="form-card" style={{ maxWidth: '450px', margin: '40px auto' }}>
+            <div className="form-title">
+              <div className="calendar">📝</div>
+              <div>
+                <h2>Criar nova Conta</h2>
+                <p>Preencha os dados abaixo para se cadastrar no Cortefolio.</p>
+              </div>
+            </div>
+
+            <form onSubmit={(e) => { e.preventDefault(); alert('Cadastro realizado com sucesso!'); setTelaAtiva('login'); }}>
+              <label>Nome Completo</label>
+              <input type="text" placeholder="Digite seu nome completo" required />
+
+              <label>Telefone / WhatsApp</label>
+              <input type="tel" placeholder="(71) 99999-9999" required />
+
+              <label>E-mail</label>
+              <input type="email" placeholder="seuemail@exemplo.com" required />
+
+              <label>Senha</label>
+              <input type="password" placeholder="Crie uma senha forte" required />
+
+              <button type="submit" className="submit-btn" style={{ marginTop: '20px' }}>
+                Finalizar Cadastro
+              </button>
+              
+              <p style={{ color: '#fff', textAlign: 'center', marginTop: '15px', fontSize: '14px' }}>
+                Já possui uma conta?{' '}
+                <span 
+                  style={{ color: '#ffcc00', cursor: 'pointer', textDecoration: 'underline', fontWeight: 'bold' }} 
+                  onClick={() => setTelaAtiva('login')}
+                >
+                  Faça o Login
+                </span>
+              </p>
             </form>
           </section>
         )}
