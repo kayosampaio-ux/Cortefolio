@@ -2,13 +2,13 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-  // Estado para controlar qual tela está ativa. Começa em 'agendar'
+  // Estado para controlar qual tela está ativa.
   const [telaAtiva, setTelaAtiva] = useState('agendar');
 
   return (
     <>
       <header className="header">
-        <div className="logo">
+        <div className="logo" style={{ cursor: 'pointer' }} onClick={() => setTelaAtiva('inicio')}>
           <div className="logo-icon">CF</div>
           <div>
             <h1>CORTEFOLIO</h1>
@@ -54,7 +54,13 @@ function App() {
           </a>
         </nav>
 
-        <button className="login-btn">Login</button>
+        {/* Botão de Login mudando o estado para a tela de login */}
+        <button 
+          className={`login-btn ${telaAtiva === 'login' ? 'active-btn' : ''}`}
+          onClick={() => setTelaAtiva('login')}
+        >
+          Login
+        </button>
       </header>
 
       <main className="container">
@@ -69,32 +75,20 @@ function App() {
           </section>
         )}
 
-        {/* TELA DE AGENDAR (Seu formulário atual) */}
+        {/* TELA DE AGENDAR */}
         {telaAtiva === 'agendar' && (
           <>
             <section className="hero">
               <div className="hero-content">
                 <p className="tag">— AGENDAMENTO ONLINE</p>
-                <h2>
-                  Seu horário,
-                  <br />
-                  <span>do seu jeito.</span>
-                </h2>
-                <p className="desc">
-                  Agende de forma rápida e fácil seu corte.
-                </p>
+                <h2>Seu horário,<br /><span>do seu jeito.</span></h2>
+                <p className="desc">Agende de forma rápida e fácil seu corte.</p>
               </div>
 
               <div className="benefits">
-                <div>
-                  🛡️ <span>Profissionais<br />Qualificados</span>
-                </div>
-                <div>
-                  🕒 <span>Agendamento<br />Rápido</span>
-                </div>
-                <div>
-                  ⭐ <span>Atendimento<br />Premium</span>
-                </div>
+                <div>🛡️ <span>Profissionais<br />Qualificados</span></div>
+                <div>🕒 <span>Agendamento<br />Rápido</span></div>
+                <div>⭐ <span>Atendimento<br />Premium</span></div>
               </div>
             </section>
 
@@ -114,17 +108,17 @@ function App() {
                 <label>Escolha o Barbeiro</label>
                 <select required>
                   <option value="">Selecione um profissional</option>
-                  <option>Alberth Tailon</option>
-                  <option>Felipe Leal</option>
-                  <option>Kayo Mario</option>
-                  <option>Ramon Jesus</option>
+                  <option>Alberth</option>
+                  <option>Felipe</option>
+                  <option>Kayo</option>
+                  <option>Ramon</option>
                 </select>
 
                 <label>Escolha o Serviço</label>
                 <select required>
                   <option value="">Selecione o serviço</option>
-                  <option>Corte masculino</option>
-                  <option>Barba</option>
+                  <option>Corte masculino - R$ 30,00</option>
+                  <option>Barba - R$15,00</option>
                   <option>Corte + Barba</option>
                   <option>Pezinho - R$ 5,00</option>
                   <option>Pigmentação - R$ 8,00</option>
@@ -141,15 +135,47 @@ function App() {
                   </div>
                 </div>
 
-                <button type="submit" className="submit-btn">
-                  Confirmar Agendamento
-                </button>
+                <button type="submit" className="submit-btn">Confirmar Agendamento</button>
               </form>
             </section>
           </>
         )}
 
-        {/* TELAS SECUNDÁRIAS (Espaços reservados para as outras seções) */}
+        {/* TELA DE LOGIN */}
+        {telaAtiva === 'login' && (
+          <section className="form-card" style={{ maxWidth: '450px', margin: '40px auto' }}>
+            <div className="form-title">
+              <div className="calendar">🔒</div>
+              <div>
+                <h2>Acesse sua Conta</h2>
+                <p>Insira suas credenciais para entrar no sistema.</p>
+              </div>
+            </div>
+
+            <form onSubmit={(e) => { e.preventDefault(); alert('Login efetuado com sucesso!'); setTelaAtiva('inicio'); }}>
+              <label>E-mail ou Usuário</label>
+              <input type="email" placeholder="exemplo@email.com" required />
+
+              <label>Senha</label>
+              <input type="password" placeholder="Digite sua senha" required />
+
+              <button type="submit" className="submit-btn" style={{ marginTop: '20px' }}>
+                Entrar
+              </button>
+              
+              <button 
+                type="button" 
+                className="submit-btn" 
+                style={{ backgroundColor: 'transparent', border: '1px solid #ffcc00', color: '#ffcc00', marginTop: '10px' }}
+                onClick={() => setTelaAtiva('agendar')}
+              >
+                Cancelar
+              </button>
+            </form>
+          </section>
+        )}
+
+        {/* TELAS SECUNDÁRIAS */}
         {telaAtiva === 'agenda' && (
           <section className="hero-content">
             <h2>📅 Visualizar Agenda</h2>
