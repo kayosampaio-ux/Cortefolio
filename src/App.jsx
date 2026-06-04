@@ -434,24 +434,18 @@ function App() {
                       </tr>
                     </thead>
                     <tbody>
-                      {listaAgendamentos.map((item) => {
-                        const cliente = buscarCliente(item.cliente_id);
-                        const servico = buscarServico(item.servico_id);
-                        const profissional = buscarProfissional(servico?.profissional_id);
-
-                        return (
+                      {listaAgendamentos.map((item) => (
                           <tr key={item.id}>
-                            <td>{cliente?.nome || item.cliente_id}</td>
-                            <td>{servico?.nome || item.servico_id}</td>
-                            <td>{profissional?.nome || '-'}</td>
+                            <td>{item.cliente}</td>
+                            <td>{item.servico}</td>
+                            <td>{item.profissional || '-'}</td>
                             <td>{formatarData(item.data_hora)}</td>
                             <td>{formatarHora(item.data_hora)}</td>
                             <td>
-                              <span className="status-label">{item.status}</span>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      <span className="status-label">{item.status}</span>
+                    </td>
+                    </tr>
+                  ))}
                     </tbody>
                   </table>
                 </div>
