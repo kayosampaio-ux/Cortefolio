@@ -1,65 +1,96 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
   // Estado para controlar qual tela está ativa.
   const [telaAtiva, setTelaAtiva] = useState('agendar');
 
-  // Estados para capturar os dados digitados nos formulários
+  // Estados para capturar os dados digitados nos formulários de Login/Cadastro
   const [loginEmail, setLoginEmail] = useState('');
   const [loginSenha, setLoginSenha] = useState('');
-
   const [cadNome, setCadNome] = useState('');
   const [cadTelefone, setCadTelefone] = useState('');
   const [cadEmail, setCadEmail] = useState('');
   const [cadSenha, setCadSenha] = useState('');
 
+  // Estados para o formulário de Agendamento
+  const [agendNome, setAgendNome] = useState('');
+  const [agendBarbeiro, setAgendBarbeiro] = useState('');
+  const [agendServico, setAgendServico] = useState('');
+  const [agendData, setAgendData] = useState('');
+  const [agendHorario, setAgendHorario] = useState('');
+
+  // Estado que guarda a lista de agendamentos reais
+  const [listaAgendamentos, setListaAgendamentos] = useState([]);
+
+  // Carrega os agendamentos já salvos ao abrir o app
+  useEffect(() => {
+    const salvos = localStorage.getItem('agendamentosCortefolio');
+    if (salvos) {
+      setListaAgendamentos(JSON.parse(salvos));
+    }
+  }, []);
+
+  // Função para salvar um novo agendamento
+  const lidarComAgendamento = (e) => {
+    e.preventDefault();
+
+    const novoAgendamento = {
+      id: Date.now(),
+      cliente: agendNome,
+      barbeiro: agendBarbeiro,
+      servico: agendServico,
+      data: agendData,
+      horario: agendHorario,
+      status: 'Confirmado'
+    };
+
+    const listaAtualizada = [...listaAgendamentos, novoAgendamento];
+    setListaAgendamentos(listaAtualizada);
+    localStorage.setItem('agendamentosCortefolio', JSON.stringify(listaAtualizada));
+
+    alert('Agendamento realizado com sucesso!');
+    
+    // Limpa o formulário
+    setAgendNome('');
+    setAgendBarbeiro('');
+    setAgendServico('');
+    setAgendData('');
+    setAgendHorario('');
+  };
+
   // Função para lidar com o Cadastro
   const lidarComCadastro = (e) => {
     e.preventDefault();
-
-    // Cria um objeto com os dados do novo usuário
     const novoUsuario = {
       nome: cadNome,
       telefone: cadTelefone,
       email: cadEmail.toLowerCase(),
       senha: cadSenha
     };
-
-    // Salva no localStorage do navegador convertendo para texto
     localStorage.setItem('usuarioCortefolio', JSON.stringify(novoUsuario));
-
     alert('Cadastro realizado com sucesso! Agora faça o seu login.');
-    
-    // Limpa o formulário de cadastro e joga para o login
-    setCadNome('');
-    setCadTelefone('');
-    setCadEmail('');
-    setCadSenha('');
+    setCadNome(''); setCadTelefone(''); setCadEmail(''); setCadSenha('');
     setTelaAtiva('login');
   };
 
   // Função para lidar com o Login
   const lidarComLogin = (e) => {
     e.preventDefault();
-
-    // Busca o usuário salvo no localStorage
     const usuarioSalvo = localStorage.getItem('usuarioCortefolio');
 
     if (!usuarioSalvo) {
-      alert('Nenhum usuário cadastrado neste navegador! Por favor, cadastre-se primeiro.');
+      alert('Nenhum usuário cadastrado neste navegador! Cadastre-se primeiro.');
       return;
     }
 
-    // Converte o texto de volta para objeto do JavaScript
     const dadosUsuario = JSON.parse(usuarioSalvo);
 
-    // Valida se o email e a senha batem perfeitamente
     if (loginEmail.toLowerCase() === dadosUsuario.email && loginSenha === dadosUsuario.senha) {
-      alert(`Bem-vindo de volta, ${dadosUsuario.nome}!`);
+      alert(`Bem-vindo, ${dadosUsuario.nome}! Entrando no Painel Admin...`);
       setLoginEmail('');
       setLoginSenha('');
-      setTelaAtiva('inicio'); // Login com sucesso, vai para o Início
+      setTelaAtiva('admin'); // Se logar com sucesso, vai direto para o Admin!
     } else {
       alert('E-mail ou senha incorretos! Tente novamente.');
     }
@@ -77,48 +108,18 @@ function App() {
         </div>
 
         <nav>
-          <a 
-            className={telaAtiva === 'inicio' ? 'active' : ''} 
-            href="#" 
-            onClick={(e) => { e.preventDefault(); setTelaAtiva('inicio'); }}
-          >
-            Início
-          </a>
-          <a 
-            className={telaAtiva === 'agendar' ? 'active' : ''} 
-            href="#" 
-            onClick={(e) => { e.preventDefault(); setTelaAtiva('agendar'); }}
-          >
-            Agendar
-          </a>
-          <a 
-            className={telaAtiva === 'agenda' ? 'active' : ''} 
-            href="#" 
-            onClick={(e) => { e.preventDefault(); setTelaAtiva('agenda'); }}
-          >
-            Agenda
-          </a>
-          <a 
-            className={telaAtiva === 'clientes' ? 'active' : ''} 
-            href="#" 
-            onClick={(e) => { e.preventDefault(); setTelaAtiva('clientes'); }}
-          >
-            Clientes
-          </a>
-          <a 
-            className={telaAtiva === 'profissionais' ? 'active' : ''} 
-            href="#" 
-            onClick={(e) => { e.preventDefault(); setTelaAtiva('profissionais'); }}
-          >
-            Profissionais
-          </a>
+          <a className={telaAtiva === 'inicio' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('inicio'); }}>Início</a>
+          <a className={telaAtiva === 'agendar' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('agendar'); }}>Agendar</a>
+          <a className={telaAtiva === 'admin' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('admin'); }}>Painel Admin</a>
+          <a className={telaAtiva === 'clientes' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('clientes'); }}>Clientes</a>
+          <a className={telaAtiva === 'profissionais' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('profissionais'); }}>Profissionais</a>
         </nav>
 
         <button 
           className={`login-btn ${telaAtiva === 'login' || telaAtiva === 'cadastro' ? 'active-btn' : ''}`}
           onClick={() => setTelaAtiva('login')}
         >
-          Login
+          {telaAtiva === 'admin' ? 'Sair (Logout)' : 'Login'}
         </button>
       </header>
 
@@ -160,12 +161,12 @@ function App() {
                 </div>
               </div>
 
-              <form onSubmit={(e) => { e.preventDefault(); alert('Agendamento Confirmado!'); }}>
+              <form onSubmit={lidarComAgendamento}>
                 <label>Seu Nome</label>
-                <input type="text" placeholder="Digite seu nome completo" required />
+                <input type="text" placeholder="Digite seu nome completo" value={agendNome} onChange={(e) => setAgendNome(e.target.value)} required />
 
                 <label>Escolha o Barbeiro</label>
-                <select required>
+                <select value={agendBarbeiro} onChange={(e) => setAgendBarbeiro(e.target.value)} required>
                   <option value="">Selecione um profissional</option>
                   <option>Alberth Tailon</option>
                   <option>Felipe Leal</option>
@@ -174,7 +175,7 @@ function App() {
                 </select>
 
                 <label>Escolha o Serviço</label>
-                <select required>
+                <select value={agendServico} onChange={(e) => setAgendServico(e.target.value)} required>
                   <option value="">Selecione o serviço</option>
                   <option>Corte masculino - R$ 30,00</option>
                   <option>Barba - R$15,00</option>
@@ -186,11 +187,11 @@ function App() {
                 <div className="row">
                   <div>
                     <label>Data</label>
-                    <input type="date" required />
+                    <input type="date" value={agendData} onChange={(e) => setAgendData(e.target.value)} required />
                   </div>
                   <div>
                     <label>Horário</label>
-                    <input type="time" required />
+                    <input type="time" value={agendHorario} onChange={(e) => setAgendHorario(e.target.value)} required />
                   </div>
                 </div>
 
@@ -207,51 +208,22 @@ function App() {
               <div className="calendar">🔒</div>
               <div>
                 <h2>Acesse sua Conta</h2>
-                <p>Insira suas credenciais para entrar no sistema.</p>
+                <p>Insira suas credenciais para acessar o painel admin.</p>
               </div>
             </div>
 
             <form onSubmit={lidarComLogin}>
               <label>E-mail ou Usuário</label>
-              <input 
-                type="email" 
-                placeholder="exemplo@email.com" 
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                required 
-              />
+              <input type="email" placeholder="exemplo@email.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required />
 
               <label>Senha</label>
-              <input 
-                type="password" 
-                placeholder="Digite sua senha" 
-                value={loginSenha}
-                onChange={(e) => setLoginSenha(e.target.value)}
-                required 
-              />
+              <input type="password" placeholder="Digite sua senha" value={loginSenha} onChange={(e) => setLoginSenha(e.target.value)} required />
 
-              <button type="submit" className="submit-btn" style={{ marginTop: '20px' }}>
-                Entrar
-              </button>
+              <button type="submit" className="submit-btn" style={{ marginTop: '20px' }}>Entrar</button>
               
               <p style={{ color: '#fff', textAlign: 'center', marginTop: '15px', fontSize: '14px' }}>
-                Não tem uma conta?{' '}
-                <span 
-                  style={{ color: '#ffcc00', cursor: 'pointer', textDecoration: 'underline', fontWeight: 'bold' }} 
-                  onClick={() => setTelaAtiva('cadastro')}
-                >
-                  Cadastre-se aqui
-                </span>
+                Não tem uma conta? <span style={{ color: '#ffcc00', cursor: 'pointer', textDecoration: 'underline', fontWeight: 'bold' }} onClick={() => setTelaAtiva('cadastro')}>Cadastre-se aqui</span>
               </p>
-
-              <button 
-                type="button" 
-                className="submit-btn" 
-                style={{ backgroundColor: 'transparent', border: '1px solid #ffcc00', color: '#ffcc00', marginTop: '15px' }}
-                onClick={() => setTelaAtiva('agendar')}
-              >
-                Cancelar
-              </button>
             </form>
           </section>
         )}
@@ -263,72 +235,93 @@ function App() {
               <div className="calendar">📝</div>
               <div>
                 <h2>Criar nova Conta</h2>
-                <p>Preencha os dados abaixo para se cadastrar no Cortefolio.</p>
+                <p>Preencha os dados abaixo para se cadastrar.</p>
               </div>
             </div>
 
             <form onSubmit={lidarComCadastro}>
               <label>Nome Completo</label>
-              <input 
-                type="text" 
-                placeholder="Digite seu nome completo" 
-                value={cadNome}
-                onChange={(e) => setCadNome(e.target.value)}
-                required 
-              />
+              <input type="text" placeholder="Digite seu nome completo" value={cadNome} onChange={(e) => setCadNome(e.target.value)} required />
 
               <label>Telefone / WhatsApp</label>
-              <input 
-                type="tel" 
-                placeholder="(71) 99999-9999" 
-                value={cadTelefone}
-                onChange={(e) => setCadTelefone(e.target.value)}
-                required 
-              />
+              <input type="tel" placeholder="(71) 99999-9999" value={cadTelefone} onChange={(e) => setCadTelefone(e.target.value)} required />
 
               <label>E-mail</label>
-              <input 
-                type="email" 
-                placeholder="seuemail@exemplo.com" 
-                value={cadEmail}
-                onChange={(e) => setCadEmail(e.target.value)}
-                required 
-              />
+              <input type="email" placeholder="seuemail@exemplo.com" value={cadEmail} onChange={(e) => setCadEmail(e.target.value)} required />
 
               <label>Senha</label>
-              <input 
-                type="password" 
-                placeholder="Crie uma senha forte" 
-                value={cadSenha}
-                onChange={(e) => setCadSenha(e.target.value)}
-                required 
-              />
+              <input type="password" placeholder="Crie uma senha forte" value={cadSenha} onChange={(e) => setCadSenha(e.target.value)} required />
 
-              <button type="submit" className="submit-btn" style={{ marginTop: '20px' }}>
-                Finalizar Cadastro
-              </button>
+              <button type="submit" className="submit-btn" style={{ marginTop: '20px' }}>Finalizar Cadastro</button>
               
               <p style={{ color: '#fff', textAlign: 'center', marginTop: '15px', fontSize: '14px' }}>
-                Já possui uma conta?{' '}
-                <span 
-                  style={{ color: '#ffcc00', cursor: 'pointer', textDecoration: 'underline', fontWeight: 'bold' }} 
-                  onClick={() => setTelaAtiva('login')}
-                >
-                  Faça o Login
-                </span>
+                Já possui uma conta? <span style={{ color: '#ffcc00', cursor: 'pointer', textDecoration: 'underline', fontWeight: 'bold' }} onClick={() => setTelaAtiva('login')}>Faça o Login</span>
               </p>
             </form>
           </section>
         )}
 
-        {/* TELAS SECUNDÁRIAS */}
-        {telaAtiva === 'agenda' && (
-          <section className="hero-content">
-            <h2>📅 Visualizar Agenda</h2>
-            <p className="desc">Aqui você verá os horários já marcados.</p>
+        {/* TELA PAINEL ADMIN (DASHBOARD) */}
+        {telaAtiva === 'admin' && (
+          <section style={{ width: '100%', color: '#fff', marginTop: '20px' }}>
+            <h2 style={{ color: '#ffcc00', marginBottom: '10px' }}>📊 Painel Administrativo</h2>
+            <p style={{ marginBottom: '30px', opacity: 0.8 }}>Gerencie e visualize as métricas e agendamentos da sua barbearia em tempo real.</p>
+            
+            {/* Cards de Métricas */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+              <div style={{ backgroundColor: '#1c1c1e', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #ffcc00', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+                <h3 style={{ opacity: 0.7, fontSize: '14px', margin: 0 }}>Total de Agendamentos</h3>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '10px 0 0 0' }}>{listaAgendamentos.length}</p>
+              </div>
+              <div style={{ backgroundColor: '#1c1c1e', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #00cc66', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+                <h3 style={{ opacity: 0.7, fontSize: '14px', margin: 0 }}>Faturamento Estimado</h3>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '10px 0 0 0', color: '#00cc66' }}>
+                  R$ {listaAgendamentos.length * 35},00
+                </p>
+              </div>
+              <div style={{ backgroundColor: '#1c1c1e', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #0088cc', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+                <h3 style={{ opacity: 0.7, fontSize: '14px', margin: 0 }}>Barbeiros Ativos</h3>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '10px 0 0 0' }}>4</p>
+              </div>
+            </div>
+
+            {/* Tabela de Agendamentos */}
+            <div style={{ backgroundColor: '#1c1c1e', padding: '25px', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', overflowX: 'auto' }}>
+              <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #2c2c2e', paddingBottom: '10px' }}>📋 Próximos Clientes Agendados</h3>
+              
+              {listaAgendamentos.length === 0 ? (
+                <p style={{ opacity: 0.6, textAlign: 'center', padding: '20px 0' }}>Nenhum agendamento realizado ainda.</p>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ color: '#ffcc00', borderBottom: '2px solid #2c2c2e' }}>
+                      <th style={{ padding: '12px' }}>Cliente</th>
+                      <th style={{ padding: '12px' }}>Barbeiro</th>
+                      <th style={{ padding: '12px' }}>Serviço</th>
+                      <th style={{ padding: '12px' }}>Data</th>
+                      <th style={{ padding: '12px' }}>Horário</th>
+                      <th style={{ padding: '12px' }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {listaAgendamentos.map((item) => (
+                      <tr key={item.id} style={{ borderBottom: '1px solid #2c2c2e' }}>
+                        <td style={{ padding: '12px' }}>{item.cliente}</td>
+                        <td style={{ padding: '12px' }}>{item.barbeiro}</td>
+                        <td style={{ padding: '12px' }}>{item.servico}</td>
+                        <td style={{ padding: '12px' }}>{item.data.split('-').reverse().join('/')}</td>
+                        <td style={{ padding: '12px' }}>{item.horario}</td>
+                        <td style={{ padding: '12px' }}><span style={{ backgroundColor: '#00cc66', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>{item.status}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </section>
         )}
 
+        {/* OUTRAS TELAS SECUNDÁRIAS */}
         {telaAtiva === 'clientes' && (
           <section className="hero-content">
             <h2>👥 Lista de Clientes</h2>
