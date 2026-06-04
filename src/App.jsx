@@ -51,7 +51,6 @@ function App() {
 
     alert('Agendamento realizado com sucesso!');
     
-    // Limpa o formulário
     setAgendNome('');
     setAgendBarbeiro('');
     setAgendServico('');
@@ -59,14 +58,15 @@ function App() {
     setAgendHorario('');
   };
 
-  // Função para lidar com o Cadastro
+  // Função para lidar com o Cadastro de Clientes comuns
   const lidarComCadastro = (e) => {
     e.preventDefault();
     const novoUsuario = {
       nome: cadNome,
       telefone: cadTelefone,
       email: cadEmail.toLowerCase(),
-      senha: cadSenha
+      senha: cadSenha,
+      tipo: 'cliente' // Identifica que é um cliente comum
     };
     localStorage.setItem('usuarioCortefolio', JSON.stringify(novoUsuario));
     alert('Cadastro realizado com sucesso! Agora faça o seu login.');
@@ -74,26 +74,43 @@ function App() {
     setTelaAtiva('login');
   };
 
-  // Função para lidar com o Login
+  // Função para lidar com o Login e bloqueio do Admin
   const lidarComLogin = (e) => {
     e.preventDefault();
-    const usuarioSalvo = localStorage.getItem('usuarioCortefolio');
 
-    if (!usuarioSalvo) {
-      alert('Nenhum usuário cadastrado neste navegador! Cadastre-se primeiro.');
+    const emailDigitado = loginEmail.toLowerCase();
+    const senhaDigitada = loginSenha;
+
+    // 1. CONFIGURAÇÃO DA CREDENCIAL DO BARBEIRO / GERENTE
+    // Altere o email e a senha abaixo para o que você quiser usar!
+    const emailAdmin = "admin@cortefolio.com";
+    const senhaAdmin = "admin123";
+
+    // Verificação 1: É o barbeiro/admin administrador?
+    if (emailDigitado === emailAdmin && senhaDigitada === senhaAdmin) {
+      alert('Acesso concedido! Bem-vindo ao Painel Administrativo.');
+      setLoginEmail('');
+      setLoginSenha('');
+      setTelaAtiva('admin'); // Vai para o Painel Secreto
       return;
     }
 
-    const dadosUsuario = JSON.parse(usuarioSalvo);
-
-    if (loginEmail.toLowerCase() === dadosUsuario.email && loginSenha === dadosUsuario.senha) {
-      alert(`Bem-vindo, ${dadosUsuario.nome}! Entrando no Painel Admin...`);
-      setLoginEmail('');
-      setLoginSenha('');
-      setTelaAtiva('admin'); // Se logar com sucesso, vai direto para o Admin!
-    } else {
-      alert('E-mail ou senha incorretos! Tente novamente.');
+    // Verificação 2: Se não for o admin, procura nos usuários/clientes comuns do localStorage
+    const usuarioSalvo = localStorage.getItem('usuarioCortefolio');
+    if (usuarioSalvo) {
+      const dadosUsuario = JSON.parse(usuarioSalvo);
+      
+      if (emailDigitado === dadosUsuario.email && senhaDigitada === dadosUsuario.senha) {
+        alert(`Olá, ${dadosUsuario.nome}! Você logou como cliente.`);
+        setLoginEmail('');
+        setLoginSenha('');
+        setTelaAtiva('inicio'); // Cliente comum vai para a Home, NÃO entra no admin
+        return;
+      }
     }
+
+    // Se não passar em nenhuma das regras:
+    alert('E-mail ou senha incorretos, ou você não tem permissão de Administrador.');
   };
 
   return (
@@ -110,14 +127,23 @@ function App() {
         <nav>
           <a className={telaAtiva === 'inicio' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('inicio'); }}>Início</a>
           <a className={telaAtiva === 'agendar' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('agendar'); }}>Agendar</a>
-          <a className={telaAtiva === 'admin' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('admin'); }}>Painel Admin</a>
+          
+          {/* O link direto para o Painel Admin foi removido daqui para os clientes não clicarem. 
+              O Barbeiro só entra fazendo login! */}
+          
           <a className={telaAtiva === 'clientes' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('clientes'); }}>Clientes</a>
           <a className={telaAtiva === 'profissionais' ? 'active' : ''} href="#" onClick={(e) => { e.preventDefault(); setTelaAtiva('profissionais'); }}>Profissionais</a>
         </nav>
 
         <button 
           className={`login-btn ${telaAtiva === 'login' || telaAtiva === 'cadastro' ? 'active-btn' : ''}`}
-          onClick={() => setTelaAtiva('login')}
+          onClick={() => {
+            if (telaAtiva === 'admin') {
+              setTelaAtiva('agendar'); // Faz Logout se já estiver no Admin
+            } else {
+              setTelaAtiva('login');
+            }
+          }}
         >
           {telaAtiva === 'admin' ? 'Sair (Logout)' : 'Login'}
         </button>
@@ -208,7 +234,7 @@ function App() {
               <div className="calendar">🔒</div>
               <div>
                 <h2>Acesse sua Conta</h2>
-                <p>Insira suas credenciais para acessar o painel admin.</p>
+                <p>Insira suas credenciais. Se for o barbeiro, use o login de gerência.</p>
               </div>
             </div>
 
@@ -261,32 +287,32 @@ function App() {
           </section>
         )}
 
-        {/* TELA PAINEL ADMIN (DASHBOARD) */}
+        {/* TELA PAINEL ADMIN (DASHBOARD) - PROTEGIDA */}
         {telaAtiva === 'admin' && (
           <section style={{ width: '100%', color: '#fff', marginTop: '20px' }}>
-            <h2 style={{ color: '#ffcc00', marginBottom: '10px' }}>📊 Painel Administrativo</h2>
-            <p style={{ marginBottom: '30px', opacity: 0.8 }}>Gerencie e visualize as métricas e agendamentos da sua barbearia em tempo real.</p>
+            <h2 style={{ color: '#ffcc00', marginBottom: '10px' }}>📊 Painel Administrativo (Barbeiro)</h2>
+            <p style={{ marginBottom: '30px', opacity: 0.8 }}>Visualização exclusiva da equipe Cortefolio.</p>
             
             {/* Cards de Métricas */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-              <div style={{ backgroundColor: '#1c1c1e', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #ffcc00', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+              <div style={{ backgroundColor: '#1c1c1e', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #ffcc00' }}>
                 <h3 style={{ opacity: 0.7, fontSize: '14px', margin: 0 }}>Total de Agendamentos</h3>
                 <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '10px 0 0 0' }}>{listaAgendamentos.length}</p>
               </div>
-              <div style={{ backgroundColor: '#1c1c1e', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #00cc66', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+              <div style={{ backgroundColor: '#1c1c1e', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #00cc66' }}>
                 <h3 style={{ opacity: 0.7, fontSize: '14px', margin: 0 }}>Faturamento Estimado</h3>
                 <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '10px 0 0 0', color: '#00cc66' }}>
                   R$ {listaAgendamentos.length * 35},00
                 </p>
               </div>
-              <div style={{ backgroundColor: '#1c1c1e', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #0088cc', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+              <div style={{ backgroundColor: '#1c1c1e', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #0088cc' }}>
                 <h3 style={{ opacity: 0.7, fontSize: '14px', margin: 0 }}>Barbeiros Ativos</h3>
                 <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '10px 0 0 0' }}>4</p>
               </div>
             </div>
 
             {/* Tabela de Agendamentos */}
-            <div style={{ backgroundColor: '#1c1c1e', padding: '25px', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0,0,0,0.3)', overflowX: 'auto' }}>
+            <div style={{ backgroundColor: '#1c1c1e', padding: '25px', borderRadius: '8px', overflowX: 'auto' }}>
               <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #2c2c2e', paddingBottom: '10px' }}>📋 Próximos Clientes Agendados</h3>
               
               {listaAgendamentos.length === 0 ? (
